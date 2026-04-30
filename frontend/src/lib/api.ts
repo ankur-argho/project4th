@@ -138,7 +138,7 @@ class ApiClient {
     role: 'client' | 'professional';
     professionalType?: ProfessionalType;
   }) {
-    const result = await this.request<{ user: User; token: string }>('/auth/register', {
+    const result = await this.request<{ user: User; token: string }>('https://ointment-booking-backend-production.up.railway.app/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -147,7 +147,7 @@ class ApiClient {
   }
 
   async login(email: string, password: string) {
-    const result = await this.request<{ user: User; token: string }>('/auth/login', {
+    const result = await this.request<{ user: User; token: string }>('https://ointment-booking-backend-production.up.railway.app/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });

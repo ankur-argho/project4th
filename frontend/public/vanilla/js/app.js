@@ -283,7 +283,7 @@
     $('btn-login').addEventListener('click', async () => {
       showMessage('');
       try {
-        const data = await apiRequest('/auth/login', {
+        const data = apiRequest('https://ointment-booking-backend-production.up.railway.app/api/auth/login', {
           method: 'POST',
           body: JSON.stringify({
             email: $('email').value.trim(),
@@ -311,7 +311,7 @@
         body.professionalType = 'doctor';
       }
       try {
-        const data = await apiRequest('/auth/register', {
+        const data = apiRequest('https://ointment-booking-backend-production.up.railway.app/api/auth/register', {
           method: 'POST',
           body: JSON.stringify(body),
         });
