@@ -15,23 +15,41 @@ const app = express();
 const isVercel = process.env.VERCEL === '1';
 
 
-// ✅ FIXED CORS (VERY IMPORTANT)
+// ✅ FINAL CORS FIX (PRODUCTION SAFE)
 app.use(
   cors({
-    origin: '*',
+    origin: [
+      'http://localhost:5173',
+      'https://ointmentpro.vercel.app',
+    ],
+    credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
 
-// ✅ Handle preflight requests
-app.options('*', cors());
+// ✅ HANDLE PREFLIGHT (CRITICAL)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 let warmupPromise: Promise<void> | null = null;
 
+
+// =============================
+// 🔹 SEED CORE SERVICES
+// =============================
 async function ensureCoreServices() {
   const coreServices = [
     {
@@ -109,9 +127,11 @@ async function ensureCoreServices() {
   ] as const;
 
   let created = 0;
+
   for (const s of coreServices) {
     const exists = await Service.exists({ name: s.name });
     if (exists) continue;
+
     await Service.create(s);
     created++;
   }
@@ -121,25 +141,36 @@ async function ensureCoreServices() {
   }
 }
 
+
+// =============================
+// 🔹 FIX PROVIDER TYPES
+// =============================
 async function ensureServiceProviderTypes() {
   await Service.updateMany(
     { providerType: { $exists: false }, category: { $in: ['Dermatology', 'Treatment', 'Consultation', 'Assessment'] } },
     { $set: { providerType: 'doctor' } }
   );
+
   await Service.updateMany(
     { providerType: { $exists: false }, category: { $in: ['Tutoring'] } },
     { $set: { providerType: 'tutor' } }
   );
+
   await Service.updateMany(
     { providerType: { $exists: false }, category: { $in: ['Consulting'] } },
     { $set: { providerType: 'consultant' } }
   );
+
   await Service.updateMany(
     { providerType: { $exists: false } },
     { $set: { providerType: 'any' } }
   );
 }
 
+
+// =============================
+// 🔹 WARMUP (DB + SEED)
+// =============================
 export async function warmupApp(): Promise<void> {
   if (!warmupPromise) {
     warmupPromise = (async () => {
@@ -148,34 +179,58 @@ export async function warmupApp(): Promise<void> {
       await ensureServiceProviderTypes();
     })();
   }
+
   await warmupPromise;
 }
 
+
+// =============================
+// 🔹 ENSURE DB READY
+// =============================
 app.use(async (_req, res, next) => {
   try {
     await warmupApp();
     return next();
   } catch (error: unknown) {
     console.error(error);
-    const message = error instanceof Error ? error.message : 'Database unavailable';
+
+    const message =
+      error instanceof Error ? error.message : 'Database unavailable';
+
     return res.status(503).json({ error: message });
   }
 });
 
+
+// =============================
+// 🔹 STATIC (LOCAL ONLY)
+// =============================
 if (!isVercel) {
   const __dirname = path.dirname(fileURLToPath(import.meta.url));
   const vanillaStatic = path.join(__dirname, '..', 'vanilla');
   app.use('/vanilla', express.static(vanillaStatic));
 }
 
+
+// =============================
+// 🔹 ROUTES
+// =============================
 app.use('/api/auth', authRoutes);
 app.use('/api/professionals', professionalRoutes);
 app.use('/api/services', serviceRoutes);
 app.use('/api/time-slots', timeSlotRoutes);
 app.use('/api/bookings', bookingRoutes);
 
+
+// =============================
+// 🔹 HEALTH CHECK
+// =============================
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'OK', message: 'Ointment Booking System API is running' });
+  res.json({
+    status: 'OK',
+    message: 'Ointment Booking System API is running',
+  });
 });
+
 
 export default app;
