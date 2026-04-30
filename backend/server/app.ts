@@ -15,7 +15,9 @@ const app = express();
 const isVercel = process.env.VERCEL === '1';
 
 
-// ✅ FINAL CORS FIX (PRODUCTION SAFE)
+// =============================
+// ✅ FINAL CORS (WORKING)
+// =============================
 app.use(
   cors({
     origin: [
@@ -28,18 +30,23 @@ app.use(
   })
 );
 
-// ✅ HANDLE PREFLIGHT (CRITICAL)
-app.use((req, res, next) => {
+
+// =============================
+// ✅ FIXED PRE-FLIGHT (TS SAFE)
+// =============================
+app.use((req, res, next): void => {
   res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 
   if (req.method === 'OPTIONS') {
-    return res.sendStatus(200);
+    res.sendStatus(200);
+    return;
   }
 
   next();
 });
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
