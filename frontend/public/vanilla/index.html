@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Appointment booking — HTML/CSS/JS client</title>
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <div>
+        <h1>Professional appointment booking</h1>
+        <p>Vanilla HTML, CSS, and JavaScript · same API as the Vite + React app</p>
+      </div>
+      <div class="toolbar" id="auth-toolbar"></div>
+    </header>
+
+    <main>
+      <div id="message"></div>
+
+      <section id="panel-auth" class="card">
+        <h2>Sign in or register</h2>
+        <div class="row row-2">
+          <div>
+            <label for="email">Email</label>
+            <input type="email" id="email" autocomplete="username" />
+          </div>
+          <div>
+            <label for="password">Password</label>
+            <input type="password" id="password" autocomplete="current-password" />
+          </div>
+        </div>
+        <div class="row row-2">
+          <div>
+            <label for="fullName">Full name (register only)</label>
+            <input type="text" id="fullName" autocomplete="name" />
+          </div>
+          <div>
+            <label for="role">Role (register only)</label>
+            <select id="role">
+              <option value="client">Client — book appointments</option>
+              <option value="professional">Professional — use React app for dashboard</option>
+            </select>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button type="button" class="btn-primary" id="btn-login">Sign in</button>
+          <button type="button" class="btn-ghost" id="btn-register">Create account</button>
+        </div>
+      </section>
+
+      <section id="panel-client" class="card hidden">
+        <h2>Find a professional</h2>
+        <div class="row row-2">
+          <div>
+            <label for="filter-specialty">Filter by specialty</label>
+            <select id="filter-specialty">
+              <option value="">All specialties</option>
+            </select>
+          </div>
+          <div>
+            <label for="filter-service">Filter by service</label>
+            <select id="filter-service">
+              <option value="">All services</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label for="filter-date">Available slots on date</label>
+          <input type="date" id="filter-date" />
+        </div>
+        <ul class="pro-list" id="pro-list"></ul>
+      </section>
+
+      <section id="panel-bookings" class="card hidden">
+        <h2>My bookings</h2>
+        <table class="bookings-table" id="bookings-table">
+          <thead>
+            <tr>
+              <th>When</th>
+              <th>Professional</th>
+              <th>Service</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </section>
+    </main>
+
+    <footer>
+      API base: <code>/api</code> on this host · MongoDB via Mongoose ·
+      <a href="/">Main app (React)</a>
+    </footer>
+
+    <dialog id="dlg-book" style="border: none; border-radius: 12px; padding: 0; max-width: 420px; width: 90%">
+      <form method="dialog" style="padding: 1.25rem">
+        <h3 style="margin: 0 0 0.75rem">Confirm booking</h3>
+        <p id="dlg-summary" style="margin: 0 0 1rem; color: #5c6578; font-size: 0.9rem"></p>
+        <label for="dlg-service">Service</label>
+        <select id="dlg-service"></select>
+        <label for="dlg-notes">Notes (optional)</label>
+        <textarea id="dlg-notes"></textarea>
+        <div class="toolbar" style="justify-content: flex-end">
+          <button type="button" class="btn-ghost" id="dlg-cancel">Cancel</button>
+          <button type="button" class="btn-primary" id="dlg-confirm">Book</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
