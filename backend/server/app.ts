@@ -16,8 +16,7 @@ const isVercel = process.env.VERCEL === '1';
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN || true,
-    credentials: true,
+    origin: '*',
   })
 );
 app.use(express.json());
