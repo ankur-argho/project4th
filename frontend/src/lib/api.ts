@@ -1,6 +1,6 @@
 // In dev, Vite proxies `/api` to the backend (see `vite.config.ts`).
 // In production, set `VITE_API_URL` to your backend origin + `/api` (or serve the API at the same origin).
-const API_URL = import.meta.env.VITE_API_URL || '/api';
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? 'https://ointment-booking-backend-production.up.railway.app/api' : '/api');
 
 export interface User {
   id: string;
@@ -138,7 +138,7 @@ class ApiClient {
     role: 'client' | 'professional';
     professionalType?: ProfessionalType;
   }) {
-    const result = await this.request<{ user: User; token: string }>('https://ointment-booking-backend-production.up.railway.app/api/auth/register', {
+    const result = await this.request<{ user: User; token: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     });
@@ -147,7 +147,7 @@ class ApiClient {
   }
 
   async login(email: string, password: string) {
-    const result = await this.request<{ user: User; token: string }>('https://ointment-booking-backend-production.up.railway.app/api/auth/login', {
+    const result = await this.request<{ user: User; token: string }>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
