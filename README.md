@@ -116,3 +116,4 @@ Atlas must allow inbound connections from deployment environment.
 Current Status
 Main runtime stack is Express + MongoDB (Mongoose).
 Repository still includes supabase/ migration files as legacy/parallel artifacts.
+
